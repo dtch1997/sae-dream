@@ -1,4 +1,5 @@
 # type: ignore
+import os
 import streamlit as st
 import pandas as pd
 import json
@@ -12,8 +13,20 @@ def load_data():
         data = json.load(f)
     return data
 
+@st.cache_data
+def load_data_from_folder(folder_path='data'):
+    all_data = []
+    for filename in os.listdir(folder_path):
+        if filename.endswith('.json'):
+            file_path = os.path.join(folder_path, filename)
+            with open(file_path, 'r') as f:
+                feature_data = json.load(f)
+                all_data.append(feature_data)
+    return all_data
 
-data = load_data()
+# Load the data
+# data = load_data()
+data = load_data_from_folder()
 
 # Sidebar
 st.sidebar.title("SAE Feature Selection")
@@ -70,8 +83,7 @@ st.dataframe(df)
 # Instructions for running the app
 st.sidebar.markdown("""
 ## How to run this app:
-1. Save this code as `app.py`
-2. Ensure you have the JSON file named `sae_examples.json` in the same directory
-3. Install required libraries: `streamlit`, `pandas`, `plotly`
-4. Run the command: `streamlit run app.py`
+1. Install required libraries: `streamlit`, `pandas`, `plotly`
+2. Ensure `data` folder contains JSON files with feature data
+3. Run the command: `streamlit run app.py`
 """)
